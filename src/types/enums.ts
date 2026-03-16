@@ -1,0 +1,63 @@
+export enum Role {
+  SUPER_ADMIN = "SUPER_ADMIN",
+  ADMIN = "ADMIN",
+  MANAGER = "MANAGER",
+  AFFILIATE = "AFFILIATE",
+  ADVERTISER = "ADVERTISER",
+}
+
+export enum ProductStatus {
+  DRAFT = "DRAFT",
+  PUBLISHED = "PUBLISHED",
+  PENDING_APPROVAL = "PENDING_APPROVAL",
+  REJECTED = "REJECTED",
+  ARCHIVED = "ARCHIVED",
+}
+
+export enum PaymentStatus {
+  PENDING = "PENDING",
+  COMPLETED = "COMPLETED",
+  FAILED = "FAILED",
+  REFUNDED = "REFUNDED",
+}
+
+export enum NotificationChannelType {
+  EMAIL = "EMAIL",
+  SMS = "SMS",
+  PUSH = "PUSH",
+  IN_APP = "IN_APP",
+}
+
+export enum NotificationTypeEnum {
+  ORDER_CONFIRMED = "ORDER_CONFIRMED",
+  ORDER_SHIPPED = "ORDER_SHIPPED",
+  ORDER_DELIVERED = "ORDER_DELIVERED",
+  ORDER_CANCELLED = "ORDER_CANCELLED",
+  ORDER_RETURNED = "ORDER_RETURNED",
+  REVIEW_REQUEST = "REVIEW_REQUEST",
+  VENDOR_APPROVED = "VENDOR_APPROVED",
+  PAYMENT_FAILED = "PAYMENT_FAILED",
+}
+
+export enum ReviewRating {
+  ONE = "ONE",
+  TWO = "TWO",
+  THREE = "THREE",
+  FOUR = "FOUR",
+  FIVE = "FIVE",
+}
+
+export enum StockStatus {
+  IN_STOCK = "IN_STOCK",
+  OUT_OF_STOCK = "OUT_OF_STOCK",
+  LOW_STOCK = "LOW_STOCK",
+}
+
+export enum OrderStatus {
+  PENDING = "PENDING",
+  PROCESSING = "PROCESSING",
+  SHIPPED = "SHIPPED",
+  DELIVERED = "DELIVERED",
+  CANCELLED = "CANCELLED",
+  RETURNED = "RETURNED",
+}

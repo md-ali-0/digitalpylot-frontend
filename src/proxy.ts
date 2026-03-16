@@ -41,8 +41,10 @@ export default async function proxy(req: NextRequest) {
       loginUrl.searchParams.set("callbackUrl", pathname);
     }
     const res = NextResponse.redirect(loginUrl);
-    // Cleanup old sessions if any
+    // Cleanup stale auth cookies before redirecting back to signin.
     res.cookies.delete("session");
+    res.cookies.delete("accessToken");
+    res.cookies.delete("refreshToken");
     return res;
   }
 

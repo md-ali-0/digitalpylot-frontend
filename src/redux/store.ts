@@ -11,6 +11,7 @@ import {
   PURGE,
   REGISTER,
   REHYDRATE,
+  createTransform,
 } from "redux-persist";
 
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
@@ -37,6 +38,19 @@ const storage =
 const authPersistConfig = {
   key: "auth",
   storage,
+  transforms: [
+    createTransform(
+      (inboundState: any) => ({
+        ...inboundState,
+        accessToken: null,
+      }),
+      (outboundState: any) => ({
+        ...outboundState,
+        accessToken: null,
+      }),
+      { whitelist: ["auth"] },
+    ),
+  ],
 };
 
 const persistedUserReducer = persistReducer(authPersistConfig, authReducer);

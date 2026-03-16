@@ -4,8 +4,8 @@ import config from "@/config";
 import { decrypt } from "@/lib/session";
 import { SetAccessToken, SetRefreshToken } from "@/lib/set-cookie";
 import {
-    passwordSetSchema,
-    PasswordSetValues,
+  passwordSetSchema,
+  PasswordSetValues,
 } from "@/schema/change-password.schema";
 import { loginSchema } from "@/schema/signin.schema";
 import { cookies } from "next/headers";
@@ -39,12 +39,14 @@ export async function signin(formData: SigninFormValues) {
       body: JSON.stringify({
         email: formData.email,
         password: formData.password,
-        platform: "client",
       }),
       credentials: "include",
     });
 
     const result = await res.json();
+
+    console.log(result);
+    
 
     if (!result?.success) {
       return {

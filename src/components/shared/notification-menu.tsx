@@ -58,7 +58,7 @@ export default function NotificationMenu() {
     };
   }, [showNotifications]);
 
-  const getNotificationIcon = (type: string) => {
+  const getNotificationIcon = (type?: string) => {
     switch (type) {
       case "NEW_MESSAGE":
       case "MESSAGE_REPLY":

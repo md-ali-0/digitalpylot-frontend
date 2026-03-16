@@ -1,5 +1,5 @@
 export const userTags = {
-  all: "all",
-  user: "user",
-  role: "role",
+  all: "User",
+  user: "User",
+  role: "Role",
 } as const;

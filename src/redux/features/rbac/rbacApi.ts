@@ -2,10 +2,24 @@ import { tags } from "@/constants";
 import { baseApi } from "../../api/baseApi";
 
 export interface AuditLogEntry {
-  // ... existing interface ...
+  id: string;
+  tenantId: string;
+  userId?: string | null;
+  action: string;
+  resourceType: string;
+  resourceId?: string | null;
+  changes?: unknown;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  createdAt: string;
 }
 
-// ... existing interface ...
+export interface PermissionCatalogItem {
+  module: string;
+  atom: string;
+  name: string;
+  description: string;
+}
 
 const rbacApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

@@ -17,7 +17,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
 
-const MENU_SECTIONS = [
+interface MenuItem {
+  label: string;
+  icon: any;
+  href: string;
+  permission: string;
+  exact?: boolean;
+}
+
+interface MenuSection {
+  title: string;
+  items: MenuItem[];
+}
+
+const MENU_SECTIONS: MenuSection[] = [
   {
     title: "Main",
     items: [

@@ -4,7 +4,8 @@ import { login } from "@/redux/features/auth/authSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import { signin } from "@/service/auth";
 import { App, Form, Input } from "antd";
-import { Lock, LogIn, Mail } from "lucide-react";
+import { ArrowRight, Lock, Mail } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -38,13 +39,13 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto space-y-8 animate-fade-in">
-      <div className="space-y-1 mb-6">
-        <h2 className="text-2xl font-extrabold tracking-tight text-slate-900">
-          Welcome Back
-        </h2>
-        <p className="text-slate-400 text-sm font-medium">
-          Enter your credentials to access your account.
+    <div className="auth-form-card">
+      <div className="auth-form-card__header">
+        <span className="auth-form-card__eyebrow">Welcome back</span>
+        <h1 className="auth-form-card__title">Sign in to your workspace</h1>
+        <p className="auth-form-card__description">
+          Use your email and password to continue into the permission-driven
+          dashboard.
         </p>
       </div>
 
@@ -53,66 +54,74 @@ export default function LoginForm() {
         layout="vertical"
         onFinish={handleLogin}
         requiredMark={false}
-        className="space-y-3"
+        className="space-y-4"
       >
         <Form.Item
           name="email"
-          className="mb-3"
-          label={
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-              Email Address
-            </span>
-          }
+          className="mb-4"
+          label={<span className="auth-form-card__label">Email address</span>}
           rules={[
             { required: true, message: "Email is required" },
             { type: "email", message: "Invalid email" },
           ]}
         >
           <Input
-            prefix={<Mail size={18} className="text-slate-300 mr-2" />}
+            prefix={<Mail size={18} className="auth-form-card__icon" />}
             placeholder="name@company.com"
-            className="h-11 rounded-xl border-slate-200 hover:border-primary focus:border-primary transition-all text-base"
+            className="auth-form-card__input"
           />
         </Form.Item>
 
         <Form.Item
           name="password"
-          className="mb-2"
-          label={
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 mr-2">
-              Password
-            </span>
-          }
+          className="mb-3"
+          label={<span className="auth-form-card__label">Password</span>}
           rules={[{ required: true, message: "Password is required" }]}
         >
           <Input.Password
-            prefix={<Lock size={18} className="text-slate-300 mr-2" />}
-            placeholder="••••••••"
-            className="h-11 rounded-xl border-slate-200 hover:border-primary focus:border-primary transition-all text-base"
+            prefix={<Lock size={18} className="auth-form-card__icon" />}
+            placeholder="Enter your password"
+            className="auth-form-card__input"
           />
         </Form.Item>
+
+        <div className="auth-form-card__meta">
+          <p>Access token refresh and secure cookie session enabled.</p>
+          <Link href="/auth/forgot-password">Forgot password?</Link>
+        </div>
 
         <button
           type="submit"
           disabled={localLoading}
-          className="group relative w-full h-12 bg-primary hover:opacity-95 text-white font-bold rounded-xl overflow-hidden shadow-lg shadow-primary/10 transition-all active:scale-[0.98] disabled:bg-slate-300 disabled:shadow-none mt-2 cursor-pointer"
+          className="auth-form-card__submit group"
         >
           <div className="relative z-10 flex items-center justify-center gap-3">
             {localLoading ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white"></div>
             ) : (
               <>
-                <span className="text-white">Sign In</span>
-                <LogIn
+                <span>Sign In</span>
+                <ArrowRight
                   size={18}
-                  className="transition-transform group-hover:translate-x-1 text-white"
+                  className="transition-transform group-hover:translate-x-1"
                 />
               </>
             )}
           </div>
-          <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+          <div className="auth-form-card__submit-glow"></div>
         </button>
       </Form>
+
+      <div className="auth-form-card__footer">
+        <div>
+          <span>Need verification?</span>
+          <Link href="/auth/verify-email">Verify email</Link>
+        </div>
+        <div>
+          <span>Secure reset flow</span>
+          <Link href="/auth/forgot-password">Open recovery</Link>
+        </div>
+      </div>
     </div>
   );
 }

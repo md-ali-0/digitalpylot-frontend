@@ -7,84 +7,84 @@ interface AuthLayoutProps {
 
 export default function AuthLayout({ children }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4 bg-[#f8fafc] overflow-hidden">
-      {/* Background Gradients aligned with Theme */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px] opacity-60"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent/5 rounded-full blur-[120px] opacity-60"></div>
+    <div className="auth-shell">
+      <div className="auth-shell__aurora auth-shell__aurora--left"></div>
+      <div className="auth-shell__aurora auth-shell__aurora--right"></div>
 
-      <div className="w-full max-w-[950px] min-h-[580px] bg-white border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-[24px] overflow-hidden relative z-10 flex flex-col md:flex-row transition-all duration-300">
-        {/* Left Side: Auth Content */}
-        <div className="flex-1 p-6 md:p-6 lg:p-8 flex flex-col relative bg-white">
-          <div className="mb-5 flex justify-center">
-            <Link href="/" className="flex items-center gap-3 group">
-              <h1 className="text-2xl font-bold tracking-tight text-primary">
-                Digital Pylot
-              </h1>
+      <div className="auth-shell__panel">
+        <div className="auth-shell__form-column">
+          <div className="auth-shell__brand-row">
+            <Link href="/" className="auth-shell__brand">
+              <span className="auth-shell__brand-mark" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+              <span className="auth-shell__brand-copy">
+                <span className="auth-shell__brand-name">Digital Pylot</span>
+                <span className="auth-shell__brand-tag">
+                  Dynamic access platform
+                </span>
+              </span>
             </Link>
           </div>
 
-          <div className="flex-1 flex flex-col justify-center">{children}</div>
+          <div className="auth-shell__content">{children}</div>
 
-          <div className="mt-5 text-center md:text-left">
-            <p className="text-xs text-slate-400 flex items-center justify-center md:justify-start gap-4">
-              <span>&copy; {new Date().getFullYear()} Digital Pylot</span>
-              <Link href="#" className="hover:text-primary transition-colors">
-                Privacy
-              </Link>
-              <Link href="#" className="hover:text-primary transition-colors">
-                Terms
-              </Link>
+          <div className="auth-shell__footer">
+            <p>
+              &copy; {new Date().getFullYear()} Digital Pylot. Secure login
+              experience for modern RBAC systems.
             </p>
           </div>
         </div>
 
-        {/* Right Side: Visual/Info Panel */}
-        <div className="hidden md:flex flex-1 relative bg-linear-to-br from-primary to-[#062c45] text-white p-10 lg:p-12 overflow-hidden items-center justify-center">
-          {/* Abstract background shapes */}
-          <div className="absolute top-0 right-0 w-full h-full opacity-5 pointer-events-none">
-            <svg viewBox="0 0 400 400" className="w-full h-full">
-              <circle cx="400" cy="0" r="300" fill="white" />
-              <path d="M0 400 L400 400 L400 0 Z" fill="white" />
-            </svg>
-          </div>
+        <div className="auth-shell__showcase">
+          <div className="auth-shell__showcase-grid"></div>
+          <div className="auth-shell__showcase-inner">
+            <div className="auth-shell__eyebrow">RBAC System v2.0</div>
+            <h2 className="auth-shell__headline">
+              Permissions define every screen, route, and action.
+            </h2>
+            <p className="auth-shell__description">
+              One shared platform where Admins and Managers control access atom
+              by atom without hard-coded role walls.
+            </p>
 
-          <div className="relative z-10 text-center space-y-6 max-w-sm">
-            <div className="inline-flex p-3 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 animate-fade-in">
-              <div className="grid grid-cols-2 gap-1.5">
-                <div className="w-6 h-6 rounded-md bg-accent"></div>
-                <div className="w-6 h-6 rounded-md bg-white/40"></div>
-                <div className="w-6 h-6 rounded-md bg-white/10"></div>
-                <div className="w-6 h-6 rounded-md bg-accent/40"></div>
+            <div className="auth-shell__stat-card">
+              <div className="auth-shell__stat-top">
+                <span>Resolved access map</span>
+                <span>Live</span>
+              </div>
+              <div className="auth-shell__stat-metric">148 atoms</div>
+              <div className="auth-shell__stat-bars">
+                <span className="is-active"></span>
+                <span className="is-active"></span>
+                <span className="is-active"></span>
+                <span></span>
+                <span></span>
+                <span className="is-accent"></span>
+              </div>
+              <div className="auth-shell__stat-foot">
+                <span>Grant ceiling enforced</span>
+                <span>Audit trail ready</span>
               </div>
             </div>
 
-            <div className="space-y-3">
-              <h2 className="text-2xl lg:text-3xl font-bold leading-tight">
-                Build Role-Based Products Faster.
-              </h2>
-              <p className="text-slate-300 text-sm lg:text-base leading-relaxed">
-                A reusable authentication and access-control starter for modern
-                full-stack applications.
-              </p>
-            </div>
-
-            <div className="pt-4 flex flex-col items-center gap-3">
-              <div className="flex -space-x-2">
-                {[1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="w-8 h-8 rounded-full border border-white/10 bg-slate-800 flex items-center justify-center text-[10px] font-medium"
-                  >
-                    {i}
-                  </div>
-                ))}
-                <div className="w-8 h-8 rounded-full border border-white/10 bg-white/10 backdrop-blur-sm flex items-center justify-center text-[10px] font-bold">
-                  +1k
-                </div>
+            <div className="auth-shell__feature-list">
+              <div>
+                <strong>Dynamic routing</strong>
+                <span>Every page is guarded by permission atoms.</span>
               </div>
-              <p className="text-[10px] font-medium text-slate-400 tracking-wider uppercase">
-                Reusable starter interface
-              </p>
+              <div>
+                <strong>Flexible delegation</strong>
+                <span>Managers can only assign access they already hold.</span>
+              </div>
+              <div>
+                <strong>Single source of truth</strong>
+                <span>UI, APIs, and audit actions stay aligned.</span>
+              </div>
             </div>
           </div>
         </div>

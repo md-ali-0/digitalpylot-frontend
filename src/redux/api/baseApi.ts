@@ -1,4 +1,5 @@
 import config from "@/config";
+import { tags } from "@/constants";
 import { signout } from "@/service/auth";
 import {
   BaseQueryFn,
@@ -68,5 +69,5 @@ export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: baseQueryWithRefreshToken,
   endpoints: () => ({}),
-  tagTypes: ["Auth", "User", "Role", "Permission", "Media", "Notification"],
+  tagTypes: [...Object.values(tags),],
 });

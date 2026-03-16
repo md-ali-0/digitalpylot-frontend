@@ -59,7 +59,7 @@ export const roleApi = baseApi.injectEndpoints({
         url: PERMISSION_URL,
         method: "GET",
       }),
-      providesTags: [tags.roleTag], // Reusing roleTag effectively or should add permissionTag?
+      providesTags: [tags.permissionTag],
     }),
   }),
 });

@@ -1,5 +1,6 @@
 "use client";
 
+import { useGetDashboardStatsQuery } from "@/redux/features/system/systemApi";
 import { useGetAllUsersQuery } from "@/redux/features/user/userApi";
 import {
   ArrowUpRight,
@@ -16,7 +17,13 @@ export default function DashboardPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { user } = useSelector((state: any) => state.auth);
   const { data: usersData } = useGetAllUsersQuery({});
+  const { data: statsData } = useGetDashboardStatsQuery(undefined);
+  
+  const stats = statsData?.stats || {};
   const totalUsers = usersData?.data?.length ?? "—";
+  const activeLeads = stats.summary?.totalLeads ?? "—";
+  const openTasks = stats.summary?.totalTasks ?? "—";
+  const conversionRate = stats.summary?.taskCompletionRate ? `${stats.summary.taskCompletionRate.toFixed(1)}%` : "—";
 
   const hour = new Date().getHours();
   const greeting =
@@ -54,31 +61,28 @@ export default function DashboardPage() {
             href: "/users",
           },
           {
-            label: "Active Leads",
-            value: "—",
+            label: "Total Leads",
+            value: activeLeads,
             icon: Target,
             color: "text-orange-500",
             bg: "bg-orange-50",
             href: "/leads",
-            note: "Module coming soon",
           },
           {
             label: "Open Tasks",
-            value: "—",
+            value: openTasks,
             icon: CheckSquare,
             color: "text-emerald-600",
             bg: "bg-emerald-50",
             href: "/tasks",
-            note: "Module coming soon",
           },
           {
-            label: "Conversion Rate",
-            value: "—",
+            label: "Task Success",
+            value: conversionRate,
             icon: TrendingUp,
             color: "text-purple-600",
             bg: "bg-purple-50",
             href: "/reports",
-            note: "Reports coming soon",
           },
         ].map((stat) => (
           <Link
@@ -103,9 +107,6 @@ export default function DashboardPage() {
             <h3 className="text-2xl font-bold text-gray-900 mt-1">
               {stat.value}
             </h3>
-            {stat.note && (
-              <p className="text-[11px] text-gray-400 mt-1">{stat.note}</p>
-            )}
           </Link>
         ))}
       </div>
@@ -154,12 +155,12 @@ export default function DashboardPage() {
               href: "/leads",
               icon: Target,
               title: "Leads",
-              desc: "Pipeline tracking for prospects. Coming soon.",
+              desc: "Pipeline tracking for prospects and CRM integration.",
               color: "from-rose-500 to-pink-500",
               light: "bg-rose-50",
               text: "text-rose-500",
-              badge: "Coming Soon",
-              badgeColor: "bg-amber-100 text-amber-700",
+              badge: "Live",
+              badgeColor: "bg-emerald-100 text-emerald-700",
             },
             {
               href: "/tasks",
@@ -169,8 +170,8 @@ export default function DashboardPage() {
               color: "from-emerald-500 to-teal-500",
               light: "bg-emerald-50",
               text: "text-emerald-600",
-              badge: "Coming Soon",
-              badgeColor: "bg-amber-100 text-amber-700",
+              badge: "Live",
+              badgeColor: "bg-emerald-100 text-emerald-700",
             },
             {
               href: "/reports",

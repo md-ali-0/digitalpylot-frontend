@@ -1,12 +1,14 @@
 "use client";
 
 import { cn } from "@/utils/cn";
-import { Bell, ChevronRight, Palette, Shield, User } from "lucide-react";
-import { useState } from "react";
+import { Bell, ChevronRight, Palette, Shield, User as UserIcon, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useUpdateUserMutation } from "@/redux/features/user/userApi";
+import { message } from "antd";
 
 const TABS = [
-  { key: "profile", label: "Profile", icon: User },
+  { key: "profile", label: "Profile", icon: UserIcon },
   { key: "notifications", label: "Notifications", icon: Bell },
   { key: "security", label: "Security", icon: Shield },
   { key: "appearance", label: "Appearance", icon: Palette },
@@ -28,8 +30,35 @@ function ComingSoonBlock({ label }: { label: string }) {
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { user } = useSelector((state: any) => state.auth);
+  const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "", // Read-only for now as per backend logic
+  });
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || "",
+        email: user.email || "",
+      });
+    }
+  }, [user]);
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await updateUser({
+        id: user.id,
+        data: { name: formData.name }
+      }).unwrap();
+      message.success("Profile updated successfully");
+    } catch (err: any) {
+      message.error(err?.data?.message || "Failed to update profile");
+    }
+  };
 
   const initials = user?.name
     ? user.name.split(" ").slice(0, 2).map((n: string) => n[0]).join("").toUpperCase()
@@ -87,28 +116,42 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              {/* Profile Fields */}
-              <div className="p-6 space-y-4">
-                {[
-                  { label: "Full Name", value: user?.name || "—" },
-                  { label: "Email Address", value: user?.email || "—" },
-                  { label: "Role", value: user?.roles?.[0] || "Member" },
-                  { label: "Status", value: user?.status || "—" },
-                ].map((field) => (
-                  <div key={field.label} className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0">
-                    <span className="text-sm text-gray-400 font-medium w-36">{field.label}</span>
-                    <span className="text-sm font-semibold text-gray-900 flex-1 text-right capitalize">
-                      {field.value}
-                    </span>
+              {/* Profile Form */}
+              <form onSubmit={handleUpdateProfile} className="p-6 space-y-6">
+                <div className="space-y-4">
+                  <div className="grid gap-2">
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Full Name</label>
+                    <input
+                      type="text"
+                      className="w-full h-11 px-4 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:border-[#FF6C37] focus:ring-2 focus:ring-orange-100 outline-hidden transition-all text-sm font-medium"
+                      placeholder="Enter your name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    />
                   </div>
-                ))}
-
-                <div className="pt-2">
-                  <p className="text-xs text-gray-300 font-medium italic">
-                    Profile editing will be available in a future update.
-                  </p>
+                  <div className="grid gap-2">
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Email Address</label>
+                    <input
+                      type="email"
+                      disabled
+                      className="w-full h-11 px-4 rounded-xl border border-gray-100 bg-gray-50/50 text-gray-400 text-sm font-medium cursor-not-allowed"
+                      value={formData.email}
+                    />
+                    <p className="text-[10px] text-gray-400 italic">Email cannot be changed for security reasons.</p>
+                  </div>
                 </div>
-              </div>
+
+                <div className="pt-4 flex items-center justify-end border-t border-gray-50">
+                  <button
+                    type="submit"
+                    disabled={isUpdating}
+                    className="h-11 px-8 rounded-xl bg-[#FF6C37] hover:bg-[#e65b2a] disabled:bg-orange-300 text-white font-bold text-sm shadow-lg shadow-orange-200 transition-all flex items-center justify-center gap-2"
+                  >
+                    {isUpdating && <Loader2 size={16} className="animate-spin" />}
+                    Save Changes
+                  </button>
+                </div>
+              </form>
             </div>
           )}
 

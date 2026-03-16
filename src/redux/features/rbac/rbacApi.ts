@@ -1,24 +1,11 @@
+import { tags } from "@/constants";
 import { baseApi } from "../../api/baseApi";
 
 export interface AuditLogEntry {
-  id: string;
-  tenantId: string;
-  userId?: string | null;
-  action: string;
-  resourceType: string;
-  resourceId?: string | null;
-  changes?: unknown;
-  ipAddress?: string | null;
-  userAgent?: string | null;
-  createdAt: string;
+  // ... existing interface ...
 }
 
-export interface PermissionCatalogItem {
-  module: string;
-  atom: string;
-  name: string;
-  description: string;
-}
+// ... existing interface ...
 
 const rbacApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -28,7 +15,7 @@ const rbacApi = baseApi.injectEndpoints({
         method: "GET",
       }),
       transformResponse: (response: { data: PermissionCatalogItem[] }) => response.data,
-      providesTags: ["Permission"],
+      providesTags: [tags.permissionTag],
     }),
     getUserPermissions: builder.query<
       {
@@ -51,7 +38,7 @@ const rbacApi = baseApi.injectEndpoints({
           grantablePermissions: PermissionCatalogItem[];
         };
       }) => response.data,
-      providesTags: ["Permission", "User"],
+      providesTags: [tags.permissionTag, tags.userTag],
     }),
     updateUserPermissions: builder.mutation<
       unknown,
@@ -62,7 +49,7 @@ const rbacApi = baseApi.injectEndpoints({
         method: "PUT",
         body: { permissionNames },
       }),
-      invalidatesTags: ["Permission", "User", "Role"],
+      invalidatesTags: [tags.permissionTag, tags.userTag, tags.roleTag],
     }),
     getAuditLogs: builder.query<AuditLogEntry[], void>({
       query: () => ({
@@ -70,7 +57,7 @@ const rbacApi = baseApi.injectEndpoints({
         method: "GET",
       }),
       transformResponse: (response: { data: AuditLogEntry[] }) => response.data,
-      providesTags: ["Permission"],
+      providesTags: [tags.auditLogTag],
     }),
   }),
 });

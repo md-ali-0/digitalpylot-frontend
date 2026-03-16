@@ -8,9 +8,10 @@ A modern, high-performance dashboard UI for the DigitalPylot Affiliate Tracking 
 - **Dynamic Content**: Redesigned to remove static placeholders and focus on real-time data.
 - **User Experience**: Smooth transitions, responsive layouts, and intuitive navigation.
 
-## 🚀 Key Features
-
 - **Modern Dashboard**: Real-time stats, dynamic greetings, and module status tracking.
+- **CRM Interfaces**: Functional Leads and Tasks management with interactive tables and filters.
+- **Analytics Dashboard**: Visual reports for lead performance and team productivity.
+- **Profile Management**: Functional profile updates in Settings with instant UI synchronization.
 - **Advanced RBAC UI**: Granular user management and permission assignment interfaces.
 - **Activity Monitoring**: Color-coded Audit Logs for system transparency.
 - **Smart Auth**: "Quick Login As" buttons for efficient role-based testing.

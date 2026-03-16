@@ -34,6 +34,12 @@ export const tags = {
   team: "team",
   billing: "billing",
   affiliate: "affiliate",
+  dashboardStats: "dashboardStats",
+  leadsTag: "leads",
+  tasksTag: "tasks",
+  authTag: "Auth",
+  permissionTag: "Permission",
+  auditLogTag: "AuditLog",
 } as const;
 
 export const tagTypes = Object.values(tags);

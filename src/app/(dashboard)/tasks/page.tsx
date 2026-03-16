@@ -1,10 +1,11 @@
 "use client";
 
-import { useGetAllTasksQuery } from "@/redux/features/tasks/tasksApi";
-import { Avatar, Input, Spin, Tag, Tooltip } from "antd";
+import { useCreateTaskMutation, useGetAllTasksQuery } from "@/redux/features/tasks/tasksApi";
+import { useGetAllUsersQuery } from "@/redux/features/user/userApi";
+import { Avatar, Input, Spin, Tag, Tooltip, Button, Modal, Form, Select, DatePicker, message } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import Table from "antd/es/table";
-import { Search, CheckSquare, Clock, User, AlertCircle, Calendar } from "lucide-react";
+import { Search, CheckSquare, Clock, User, AlertCircle, Calendar, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 
 interface TaskData {
@@ -29,11 +30,35 @@ const PRIORITY_COLORS: Record<string, string> = {
   LOW: "blue",
 };
 
+const TASK_STATUSES = ["TODO", "IN_PROGRESS", "DONE", "CANCELLED"];
+const TASK_PRIORITIES = ["HIGH", "MEDIUM", "LOW"];
+
 export default function TasksPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [form] = Form.useForm();
+
   const { data, isLoading } = useGetAllTasksQuery(
     searchTerm ? { search: searchTerm } : {}
   );
+  const { data: usersData } = useGetAllUsersQuery({});
+  const [createTask, { isLoading: isCreating }] = useCreateTaskMutation();
+
+  const handleCreateTask = async (values: any) => {
+    try {
+      // Format date for backend
+      const submitData = {
+        ...values,
+        dueDate: values.dueDate ? values.dueDate.format("YYYY-MM-DD") : undefined,
+      };
+      await createTask(submitData).unwrap();
+      message.success("Task created successfully");
+      setIsModalOpen(false);
+      form.resetFields();
+    } catch (error: any) {
+      message.error(error?.data?.message || "Failed to create task");
+    }
+  };
 
   const tasks = useMemo(
     () =>
@@ -111,13 +136,23 @@ export default function TasksPage() {
             Track actions, deadlines, and responsibilities across your team.
           </p>
         </div>
-        {!isLoading && (
-          <div className="flex items-center gap-2 bg-white border border-gray-100 rounded-xl px-4 py-2 shadow-sm">
-            <Clock size={15} className="text-[#FF6C37]" />
-            <span className="text-sm font-bold text-gray-900">{tasks.length}</span>
-            <span className="text-xs text-gray-400">active tasks</span>
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          {!isLoading && (
+            <div className="hidden md:flex items-center gap-2 bg-white border border-gray-100 rounded-xl px-4 py-2 shadow-sm">
+              <Clock size={15} className="text-[#FF6C37]" />
+              <span className="text-sm font-bold text-gray-900">{tasks.length}</span>
+              <span className="text-xs text-gray-400">active tasks</span>
+            </div>
+          )}
+          <Button
+            type="primary"
+            icon={<Plus size={16} />}
+            onClick={() => setIsModalOpen(true)}
+            className="h-10 px-5 rounded-xl bg-[#FF6C37] hover:bg-[#e85a29] border-none font-bold"
+          >
+            Add Task
+          </Button>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -133,6 +168,106 @@ export default function TasksPage() {
             />
           </div>
         </div>
+
+        <Modal
+          title={<span className="text-lg font-bold text-gray-900">Create New Task</span>}
+          open={isModalOpen}
+          onCancel={() => setIsModalOpen(false)}
+          footer={null}
+          centered
+          className="rounded-2xl"
+        >
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleCreateTask}
+            className="mt-4"
+          >
+            <Form.Item
+              name="title"
+              label={<span className="text-xs font-bold uppercase tracking-wider text-gray-400">Task Title</span>}
+              rules={[{ required: true, message: "Title is required" }]}
+            >
+              <Input placeholder="E.g. Follow up with client" className="h-10 rounded-xl" />
+            </Form.Item>
+
+            <Form.Item
+              name="description"
+              label={<span className="text-xs font-bold uppercase tracking-wider text-gray-400">Description</span>}
+            >
+              <Input.TextArea placeholder="Details about the task..." className="rounded-xl" rows={3} />
+            </Form.Item>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Form.Item
+                name="status"
+                label={<span className="text-xs font-bold uppercase tracking-wider text-gray-400">Status</span>}
+                initialValue="TODO"
+              >
+                <Select className="h-10 w-full text-sm">
+                  {TASK_STATUSES.map((status) => (
+                    <Select.Option key={status} value={status}>
+                      {status.replace("_", " ")}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+
+              <Form.Item
+                name="priority"
+                label={<span className="text-xs font-bold uppercase tracking-wider text-gray-400">Priority</span>}
+                initialValue="MEDIUM"
+              >
+                <Select className="h-10 w-full text-sm">
+                  {TASK_PRIORITIES.map((priority) => (
+                    <Select.Option key={priority} value={priority}>
+                      {priority}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Form.Item
+                name="dueDate"
+                label={<span className="text-xs font-bold uppercase tracking-wider text-gray-400">Due Date</span>}
+              >
+                <DatePicker className="h-10 w-full rounded-xl" />
+              </Form.Item>
+
+              <Form.Item
+                name="assignedToId"
+                label={<span className="text-xs font-bold uppercase tracking-wider text-gray-400">Assign To</span>}
+              >
+                <Select placeholder="Select user" className="h-10 w-full" allowClear>
+                  {usersData?.data?.map((user: any) => (
+                    <Select.Option key={user.id} value={user.id}>
+                      {user.name || user.email}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <Button
+                onClick={() => setIsModalOpen(false)}
+                className="h-10 rounded-xl font-bold text-gray-400 border-none"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={isCreating}
+                className="h-10 px-8 rounded-xl bg-[#FF6C37] hover:bg-[#e85a29] border-none font-bold"
+              >
+                Create Task
+              </Button>
+            </div>
+          </Form>
+        </Modal>
 
         {isLoading ? (
           <div className="h-72 flex items-center justify-center">

@@ -1,10 +1,11 @@
 "use client";
 
-import { useGetAllLeadsQuery } from "@/redux/features/leads/leadsApi";
-import { Avatar, Input, Spin, Badge } from "antd";
+import { useCreateLeadMutation, useGetAllLeadsQuery } from "@/redux/features/leads/leadsApi";
+import { useGetAllUsersQuery } from "@/redux/features/user/userApi";
+import { Avatar, Input, Spin, Badge, Button, Modal, Form, Select, message } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import Table from "antd/es/table";
-import { Search, Target, Mail, Building, Phone } from "lucide-react";
+import { Search, Target, Mail, Building, Phone, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 
 interface LeadData {
@@ -25,11 +26,29 @@ const STATUS_COLORS: Record<string, string> = {
   WON: "bg-indigo-50 text-indigo-700 border-indigo-100",
 };
 
+const LEAD_STATUSES = ["NEW", "CONTACTED", "QUALIFIED", "LOST", "WON"];
+
 export default function LeadsPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [form] = Form.useForm();
+
   const { data, isLoading } = useGetAllLeadsQuery(
     searchTerm ? { search: searchTerm } : {}
   );
+  const { data: usersData } = useGetAllUsersQuery({});
+  const [createLead, { isLoading: isCreating }] = useCreateLeadMutation();
+
+  const handleCreateLead = async (values: any) => {
+    try {
+      await createLead(values).unwrap();
+      message.success("Lead created successfully");
+      setIsModalOpen(false);
+      form.resetFields();
+    } catch (error: any) {
+      message.error(error?.data?.message || "Failed to create lead");
+    }
+  };
 
   const leads = useMemo(
     () =>
@@ -117,13 +136,23 @@ export default function LeadsPage() {
             Manage your sales pipeline and track potential customer interactions.
           </p>
         </div>
-        {!isLoading && (
-          <div className="flex items-center gap-2 bg-white border border-gray-100 rounded-xl px-4 py-2 shadow-sm">
-            <Target size={15} className="text-[#FF6C37]" />
-            <span className="text-sm font-bold text-gray-900">{leads.length}</span>
-            <span className="text-xs text-gray-400">total leads</span>
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          {!isLoading && (
+            <div className="hidden md:flex items-center gap-2 bg-white border border-gray-100 rounded-xl px-4 py-2 shadow-sm">
+              <Target size={15} className="text-[#FF6C37]" />
+              <span className="text-sm font-bold text-gray-900">{leads.length}</span>
+              <span className="text-xs text-gray-400">total leads</span>
+            </div>
+          )}
+          <Button
+            type="primary"
+            icon={<Plus size={16} />}
+            onClick={() => setIsModalOpen(true)}
+            className="h-10 px-5 rounded-xl bg-[#FF6C37] hover:bg-[#e85a29] border-none font-bold"
+          >
+            Add Lead
+          </Button>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -139,6 +168,106 @@ export default function LeadsPage() {
             />
           </div>
         </div>
+
+        <Modal
+          title={<span className="text-lg font-bold text-gray-900">Add New Lead</span>}
+          open={isModalOpen}
+          onCancel={() => setIsModalOpen(false)}
+          footer={null}
+          centered
+          className="rounded-2xl"
+        >
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleCreateLead}
+            className="mt-4"
+          >
+            <div className="grid grid-cols-2 gap-4">
+              <Form.Item
+                name="firstName"
+                label={<span className="text-xs font-bold uppercase tracking-wider text-gray-400">First Name</span>}
+                rules={[{ required: true, message: "Required" }]}
+              >
+                <Input placeholder="John" className="h-10 rounded-xl" />
+              </Form.Item>
+              <Form.Item
+                name="lastName"
+                label={<span className="text-xs font-bold uppercase tracking-wider text-gray-400">Last Name</span>}
+              >
+                <Input placeholder="Doe" className="h-10 rounded-xl" />
+              </Form.Item>
+            </div>
+
+            <Form.Item
+              name="email"
+              label={<span className="text-xs font-bold uppercase tracking-wider text-gray-400">Email Address</span>}
+              rules={[{ type: "email", message: "Invalid email" }]}
+            >
+              <Input placeholder="john@example.com" className="h-10 rounded-xl" />
+            </Form.Item>
+
+            <Form.Item
+              name="phone"
+              label={<span className="text-xs font-bold uppercase tracking-wider text-gray-400">Phone Number</span>}
+            >
+              <Input placeholder="+1..." className="h-10 rounded-xl" />
+            </Form.Item>
+
+            <Form.Item
+              name="company"
+              label={<span className="text-xs font-bold uppercase tracking-wider text-gray-400">Company Name</span>}
+            >
+              <Input placeholder="Acme Inc." className="h-10 rounded-xl" />
+            </Form.Item>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Form.Item
+                name="status"
+                label={<span className="text-xs font-bold uppercase tracking-wider text-gray-400">Status</span>}
+                initialValue="NEW"
+              >
+                <Select className="h-10 w-full">
+                  {LEAD_STATUSES.map((status) => (
+                    <Select.Option key={status} value={status}>
+                      {status}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+
+              <Form.Item
+                name="assignedToId"
+                label={<span className="text-xs font-bold uppercase tracking-wider text-gray-400">Assign To</span>}
+              >
+                <Select placeholder="Select user" className="h-10 w-full" allowClear>
+                  {usersData?.data?.map((user: any) => (
+                    <Select.Option key={user.id} value={user.id}>
+                      {user.name || user.email}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <Button
+                onClick={() => setIsModalOpen(false)}
+                className="h-10 rounded-xl font-bold text-gray-400 border-none"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={isCreating}
+                className="h-10 px-8 rounded-xl bg-[#FF6C37] hover:bg-[#e85a29] border-none font-bold"
+              >
+                Create Lead
+              </Button>
+            </div>
+          </Form>
+        </Modal>
 
         {isLoading ? (
           <div className="h-72 flex items-center justify-center">

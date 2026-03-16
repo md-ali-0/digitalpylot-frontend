@@ -1,10 +1,11 @@
 "use client";
 
-import { useGetAllUsersQuery } from "@/redux/features/user/userApi";
-import { Avatar, Input, Spin } from "antd";
+import { useCreateUserMutation, useGetAllUsersQuery } from "@/redux/features/user/userApi";
+import { useGetRolesQuery } from "@/redux/features/role/roleApi";
+import { Avatar, Input, Spin, Button, Modal, Form, Select, message } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import Table from "antd/es/table";
-import { Clock, Search, Shield, Users } from "lucide-react";
+import { Clock, Search, Shield, Users, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 
 interface UserData {
@@ -31,9 +32,25 @@ const ROLE_COLORS: Record<string, string> = {
 
 export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [form] = Form.useForm();
+
   const { data, isLoading } = useGetAllUsersQuery(
     searchTerm ? { search: searchTerm } : {}
   );
+  const { data: rolesData } = useGetRolesQuery({});
+  const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
+
+  const handleCreateUser = async (values: any) => {
+    try {
+      await createUser(values).unwrap();
+      message.success("User created successfully");
+      setIsModalOpen(false);
+      form.resetFields();
+    } catch (error: any) {
+      message.error(error?.data?.message || "Failed to create user");
+    }
+  };
 
   const users = useMemo(
     () =>
@@ -127,15 +144,25 @@ export default function UsersPage() {
             Browse team members, inspect roles, and manage permission overrides.
           </p>
         </div>
-        {!isLoading && (
-          <div className="flex items-center gap-2 bg-white border border-gray-100 rounded-xl px-4 py-2 shadow-sm">
-            <Users size={15} className="text-[#FF6C37]" />
-            <span className="text-sm font-bold text-gray-900">
-              {users.length}
-            </span>
-            <span className="text-xs text-gray-400">total</span>
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          {!isLoading && (
+            <div className="hidden md:flex items-center gap-2 bg-white border border-gray-100 rounded-xl px-4 py-2 shadow-sm">
+              <Users size={15} className="text-[#FF6C37]" />
+              <span className="text-sm font-bold text-gray-900">
+                {users.length}
+              </span>
+              <span className="text-xs text-gray-400">total</span>
+            </div>
+          )}
+          <Button
+            type="primary"
+            icon={<Plus size={16} />}
+            onClick={() => setIsModalOpen(true)}
+            className="h-10 px-5 rounded-xl bg-[#FF6C37] hover:bg-[#e85a29] border-none font-bold"
+          >
+            Add User
+          </Button>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -155,6 +182,83 @@ export default function UsersPage() {
             />
           </div>
         </div>
+
+        <Modal
+          title={<span className="text-lg font-bold text-gray-900">Add New Team Member</span>}
+          open={isModalOpen}
+          onCancel={() => setIsModalOpen(false)}
+          footer={null}
+          centered
+          className="rounded-2xl"
+        >
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleCreateUser}
+            className="mt-4"
+          >
+            <Form.Item
+              name="name"
+              label={<span className="text-xs font-bold uppercase tracking-wider text-gray-400">Full Name</span>}
+              rules={[{ required: true, message: "Name is required" }]}
+            >
+              <Input placeholder="John Doe" className="h-10 rounded-xl" />
+            </Form.Item>
+
+            <Form.Item
+              name="email"
+              label={<span className="text-xs font-bold uppercase tracking-wider text-gray-400">Email Address</span>}
+              rules={[
+                { required: true, message: "Email is required" },
+                { type: "email", message: "Invalid email" }
+              ]}
+            >
+              <Input placeholder="john@example.com" className="h-10 rounded-xl" />
+            </Form.Item>
+
+            <Form.Item
+              name="password"
+              label={<span className="text-xs font-bold uppercase tracking-wider text-gray-400">Password</span>}
+              rules={[
+                { required: true, message: "Password is required" },
+                { min: 8, message: "At least 8 characters" }
+              ]}
+            >
+              <Input.Password placeholder="••••••••" className="h-10 rounded-xl" />
+            </Form.Item>
+
+            <Form.Item
+              name="role"
+              label={<span className="text-xs font-bold uppercase tracking-wider text-gray-400">Assign Role</span>}
+              rules={[{ required: true, message: "Role is required" }]}
+            >
+              <Select placeholder="Select role" className="h-10 w-full" allowClear>
+                {rolesData?.data?.map((role: any) => (
+                  <Select.Option key={role.id} value={role.name}>
+                    {role.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <Button
+                onClick={() => setIsModalOpen(false)}
+                className="h-10 rounded-xl font-bold text-gray-400 border-none"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={isCreating}
+                className="h-10 px-8 rounded-xl bg-[#FF6C37] hover:bg-[#e85a29] border-none font-bold"
+              >
+                Create User
+              </Button>
+            </div>
+          </Form>
+        </Modal>
 
         {/* Table */}
         {isLoading ? (

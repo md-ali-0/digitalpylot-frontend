@@ -4,7 +4,7 @@ import {
   useResendVerificationEmailMutation,
   useVerifyEmailMutation,
 } from "@/redux/features/auth/authApi";
-import { App, Button, Form, Input, Result, Spin } from "antd";
+import { App, Form, Input, Spin } from "antd";
 import { jwtDecode } from "jwt-decode";
 import { CheckCircle, Mail, XCircle } from "lucide-react";
 import Link from "next/link";
@@ -17,7 +17,7 @@ export default function VerifyEmailPage() {
   const token = searchParams.get("token");
   const { message } = App.useApp();
 
-  const [verifyEmail, { isLoading }] = useVerifyEmailMutation();
+  const [verifyEmail] = useVerifyEmailMutation();
   const [resendVerificationEmail, { isLoading: isResending }] =
     useResendVerificationEmailMutation();
 
@@ -28,8 +28,6 @@ export default function VerifyEmailPage() {
   const [showResend, setShowResend] = useState(false);
   const [prefilledEmail, setPrefilledEmail] = useState<string>("");
   const [showTenantField, setShowTenantField] = useState(false);
-
-  // Use a ref to prevent double execution in React Strict Mode
   const hasVerified = useRef(false);
 
   useEffect(() => {
@@ -41,13 +39,11 @@ export default function VerifyEmailPage() {
         return;
       }
 
-      // Try extraction of email from token anyway
       try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const decoded: any = jwtDecode(token);
-        if (decoded?.email) {
-          setPrefilledEmail(decoded.email);
-        }
-      } catch (e) {
+        if (decoded?.email) setPrefilledEmail(decoded.email);
+      } catch {
         // Ignore decode errors
       }
 
@@ -55,14 +51,12 @@ export default function VerifyEmailPage() {
       hasVerified.current = true;
 
       try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const res: any = await verifyEmail(token);
-
         if (res?.data?.success || res?.data?.message) {
           setVerificationStatus("success");
           message.success("Email verified successfully!");
-          setTimeout(() => {
-            router.push("/auth/signin");
-          }, 3000);
+          setTimeout(() => router.push("/auth/signin"), 3000);
         } else {
           setVerificationStatus("error");
           setErrorMessage(
@@ -72,25 +66,20 @@ export default function VerifyEmailPage() {
           );
           setShowResend(true);
         }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        console.error("Verification error details:", error);
-        let msg = "An unexpected error occurred.";
-        if (error?.status === "FETCH_ERROR") {
-          msg = "Network error. Please check your connection or CORS settings.";
-        } else if (error?.data?.message) {
-          msg = error.data.message;
-        }
         setVerificationStatus("error");
-        setErrorMessage(msg);
+        setErrorMessage(error?.data?.message || "An unexpected error occurred.");
         setShowResend(true);
       }
     };
-
     verifyToken();
   }, [token, verifyEmail, router, message]);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleResend = async (values: { email: string; tenantId?: string }) => {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const res: any = await resendVerificationEmail({
         email: values.email,
         tenantId: values.tenantId?.trim() || undefined,
@@ -102,24 +91,16 @@ export default function VerifyEmailPage() {
         const errData = res?.error?.data;
         const code = errData?.error?.code || errData?.code;
         if (code === "auth.multiple_accounts") {
-          message.warning(
-            "Multiple accounts found. Enter your network subdomain and try again.",
-          );
+          message.warning("Multiple accounts found. Enter your network subdomain.");
           setShowTenantField(true);
         } else {
-          message.error(
-            errData?.error?.message ||
-              errData?.message ||
-              "Failed to resend email.",
-          );
+          message.error(errData?.error?.message || errData?.message || "Failed to resend email.");
         }
       }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       const code = error?.data?.error?.code || error?.data?.code;
       if (code === "auth.multiple_accounts") {
-        message.warning(
-          "Multiple accounts found. Enter your network subdomain and try again.",
-        );
         setShowTenantField(true);
       } else {
         message.error("An error occurred. Please try again.");
@@ -128,106 +109,99 @@ export default function VerifyEmailPage() {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto animate-fade-in 0">
+    <div className="w-full">
       {verificationStatus === "verifying" && (
-        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+        <div className="flex flex-col items-center justify-center py-16 space-y-6">
           <Spin size="large" />
-          <p className="text-slate-500 font-medium animate-pulse">
-            Verifying your email...
-          </p>
+          <p className="text-gray-500 font-medium animate-pulse">Verifying your email...</p>
         </div>
       )}
 
       {verificationStatus === "success" && (
-        <Result
-          icon={<CheckCircle className="text-emerald-500 w-16 h-16 mx-auto" />}
-          title={
-            <span className="text-2xl font-bold text-slate-900">Verified!</span>
-          }
-          subTitle="Your email address has been successfully verified. You can now access your account."
-          extra={[
-            <Link key="login" href="/auth/signin">
-              <Button
-                type="primary"
-                size="large"
-                className="bg-primary h-11 px-8 rounded-xl font-bold border-none shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform"
-              >
-                Go to Login
-              </Button>
-            </Link>,
-          ]}
-        />
+        <div className="flex flex-col items-center text-center py-8 space-y-5">
+          <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center">
+            <CheckCircle className="text-green-500 w-10 h-10" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Email Verified!</h1>
+            <p className="text-gray-500 text-sm">
+              Your email address has been successfully verified. Redirecting to login...
+            </p>
+          </div>
+          <Link
+            href="/auth/signin"
+            className="w-full h-12 bg-[#FF6C37] text-white rounded-xl text-[15px] font-semibold shadow-[0_6px_20px_rgba(255,108,55,0.3)] hover:bg-[#F25A24] transition-all flex items-center justify-center"
+          >
+            Go to Login
+          </Link>
+        </div>
       )}
 
       {verificationStatus === "error" && (
-        <div className="text-center">
-          <Result
-            icon={<XCircle className="text-rose-500 w-16 h-16 mx-auto" />}
-            title={
-              <span className="text-2xl font-bold text-slate-900">
-                Verification Failed
-              </span>
-            }
-            subTitle={<span className="text-slate-500">{errorMessage}</span>}
-          />
+        <div className="flex flex-col items-center text-center space-y-6">
+          <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center">
+            <XCircle className="text-red-500 w-10 h-10" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Verification Failed</h1>
+            <p className="text-gray-500 text-sm">{errorMessage}</p>
+          </div>
 
           {showResend && (
-            <div className="mt-6 p-6 bg-slate-50 rounded-xl border border-slate-100">
-              <h3 className="font-semibold text-slate-700 mb-4">
-                Resend Verification Email
-              </h3>
+            <div className="w-full p-6 bg-gray-50 rounded-2xl border border-gray-100 text-left">
+              <h3 className="font-semibold text-gray-800 mb-4">Resend Verification Email</h3>
               <Form
                 onFinish={handleResend}
                 layout="vertical"
                 initialValues={{ email: prefilledEmail }}
-                key={prefilledEmail} // Force re-render when email loads
+                key={prefilledEmail}
               >
                 <Form.Item
                   name="email"
+                  label={<span className="font-medium text-gray-700">Email Address</span>}
                   rules={[
                     { required: true, message: "Please input your email!" },
                     { type: "email", message: "Please enter a valid email!" },
                   ]}
+                  className="mb-4!"
                 >
                   <Input
-                    prefix={<Mail className="w-4 h-4 text-slate-400" />}
+                    prefix={<Mail className="w-4 h-4 text-gray-400 mr-1" />}
                     placeholder="Enter your email address"
-                    size="large"
                     readOnly
-                    className="rounded-lg"
+                    className="h-12! rounded-xl! border-gray-200"
                   />
                 </Form.Item>
                 {showTenantField && (
-                  <Form.Item name="tenantId" label="Network / Subdomain">
+                  <Form.Item
+                    name="tenantId"
+                    label={<span className="font-medium text-gray-700">Network / Subdomain</span>}
+                    className="mb-4!"
+                  >
                     <Input
                       placeholder="e.g. default"
-                      size="large"
-                      className="rounded-lg"
+                      className="h-12! rounded-xl! border-gray-200 hover:border-gray-300"
                     />
                   </Form.Item>
                 )}
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={isResending}
-                  block
-                  size="large"
-                  className="bg-slate-800 hover:bg-slate-700 h-11 rounded-lg font-medium"
+                <button
+                  type="submit"
+                  disabled={isResending}
+                  className="w-full h-12 bg-[#FF6C37] text-white rounded-xl text-[15px] font-semibold shadow-[0_6px_20px_rgba(255,108,55,0.3)] hover:bg-[#F25A24] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
                 >
-                  Resend Email
-                </Button>
+                  {isResending ? (
+                    <div className="w-5 h-5 border-[3px] border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    "Resend Email"
+                  )}
+                </button>
               </Form>
             </div>
           )}
 
-          <div className="mt-6">
-            <Link href="/auth/signin">
-              <Button
-                type="text"
-                className="text-slate-500 hover:text-slate-700"
-              >
-                Back to Login
-              </Button>
+          <div className="text-[15px] text-gray-500">
+            <Link href="/auth/signin" className="text-gray-900 font-semibold hover:text-[#FF6C37] transition-colors">
+              ← Back to Login
             </Link>
           </div>
         </div>

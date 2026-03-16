@@ -1,34 +1,41 @@
 "use client";
 
-import { HomeOutlined, LockOutlined } from "@ant-design/icons";
-import { Button } from "antd";
+import { Lock, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-export default function Forbidden() {
+export default function ForbiddenPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-      <div className="text-center max-w-md">
-        <div className="inline-block p-4 rounded-full bg-emerald-100 mb-6">
-          <LockOutlined className="text-4xl text-emerald-600" />
+    <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center p-6">
+      <div className="max-w-md w-full text-center space-y-8 animate-in zoom-in duration-300">
+        <div className="relative">
+          <div className="w-32 h-32 bg-orange-50 rounded-full flex items-center justify-center mx-auto">
+            <Lock className="text-[#FF6C37] w-14 h-14" />
+          </div>
+          <div className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">
+            Access Denied
+          </div>
         </div>
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">Access Denied</h1>
-        <p className="text-gray-600 mb-8">
-          Sorry, you don&apos;t have permission to access this page. Please
-          contact your administrator if you believe this is an error.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/">
-            <Button
-              type="primary"
-              icon={<HomeOutlined />}
-              size="large"
-              className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 border-0"
-            >
-              Back to Home
-            </Button>
+
+        <div className="space-y-3">
+          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">403 Forbidden</h1>
+          <p className="text-gray-500 font-medium max-w-[280px] mx-auto text-[15px]">
+            You don't have permission to access this page. Please contact your manager if you believe this is an error.
+          </p>
+        </div>
+
+        <div className="pt-4 flex flex-col gap-3">
+          <Link 
+            href="/"
+            className="w-full h-12 bg-[#FF6C37] text-white rounded-xl text-[15px] font-semibold shadow-[0_6px_20px_rgba(255,108,55,0.3)] hover:bg-[#F25A24] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+          >
+            <ArrowLeft size={18} />
+            Back to Dashboard
           </Link>
-          <Link href="/auth/signin">
-            <Button size="large">Sign In</Button>
+          <Link 
+            href="/auth/signin"
+            className="w-full h-12 bg-white text-gray-700 border border-gray-100 rounded-xl text-[15px] font-semibold hover:bg-gray-50 transition-all flex items-center justify-center"
+          >
+            Switch Account
           </Link>
         </div>
       </div>

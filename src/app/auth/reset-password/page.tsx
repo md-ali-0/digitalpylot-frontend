@@ -2,8 +2,7 @@
 "use client";
 
 import { useResetPasswordMutation } from "@/redux/features/auth/authApi";
-import { App, Button, Form, Input } from "antd";
-import { Key, Lock } from "lucide-react";
+import { App, Form, Input } from "antd";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -41,14 +40,10 @@ export default function ResetPasswordPage() {
       });
 
       if (res?.data?.success) {
-        message.success(
-          "Password changed successfully. Redirecting to login...",
-        );
+        message.success("Password changed successfully. Redirecting to login...");
         router.push("/auth/signin");
       } else {
-        message.error(
-          res?.error?.data?.error?.message || "Failed to reset password",
-        );
+        message.error(res?.error?.data?.error?.message || "Failed to reset password");
       }
     } catch (error: any) {
       if (error?.data?.details?.length > 0) {
@@ -64,14 +59,10 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto space-y-8 animate-fade-in">
-      <div className="space-y-1 mb-6">
-        <h2 className="text-2xl font-extrabold tracking-tight text-slate-900">
-          Reset Password
-        </h2>
-        <p className="text-slate-400 text-sm font-medium">
-          Enter your new password below
-        </p>
+    <div className="w-full">
+      <div className="text-center mb-10">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Reset Password</h1>
+        <p className="text-gray-500 text-sm">Enter your new password below</p>
       </div>
 
       <Form
@@ -79,44 +70,30 @@ export default function ResetPasswordPage() {
         layout="vertical"
         onFinish={handleSubmit}
         requiredMark={false}
-        className="space-y-3"
+        className="space-y-5"
       >
         <Form.Item
           name="newPassword"
-          label={
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-              New Password
-            </span>
-          }
+          label={<span className="font-medium text-gray-700">New Password</span>}
           rules={[
             { required: true, message: "Please enter a new password" },
+            { min: 8, message: "Password must be at least 8 characters long!" },
             {
-              min: 8,
-              message: "Password must be at least 8 characters long!",
-            },
-            {
-              pattern:
-                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).*$/,
-              message:
-                "Password must contain at least one lowercase letter, uppercase letter, number, and special character!",
+              pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).*$/,
+              message: "Must contain uppercase, lowercase, number, and special character",
             },
           ]}
-          className="mb-3"
+          className="mb-5!"
         >
           <Input.Password
-            prefix={<Lock size={18} className="text-slate-300 mr-2" />}
             placeholder="New Password"
-            className="h-11 rounded-xl border-slate-200 hover:border-primary focus:border-primary transition-all text-base"
+            className="h-12! rounded-xl! border-gray-200 hover:border-gray-300 focus:border-[#FF6C37] transition-all px-4 text-gray-900"
           />
         </Form.Item>
 
         <Form.Item
           name="confirmPassword"
-          label={
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-              Confirm Password
-            </span>
-          }
+          label={<span className="font-medium text-gray-700">Confirm Password</span>}
           dependencies={["newPassword"]}
           rules={[
             { required: true, message: "Please confirm your password" },
@@ -129,41 +106,33 @@ export default function ResetPasswordPage() {
               },
             }),
           ]}
-          className="mb-3"
+          className="mb-5!"
         >
           <Input.Password
-            prefix={<Lock size={18} className="text-slate-300 mr-2" />}
             placeholder="Confirm Password"
-            className="h-11 rounded-xl border-slate-200 hover:border-primary focus:border-primary transition-all text-base"
+            className="h-12! rounded-xl! border-gray-200 hover:border-gray-300 focus:border-[#FF6C37] transition-all px-4 text-gray-900"
           />
         </Form.Item>
 
-        <Button
-          type="primary"
-          htmlType="submit"
-          loading={loading}
-          className="w-full h-12 bg-primary hover:opacity-95 text-white font-bold rounded-xl shadow-lg shadow-primary/10 border-none mt-2 flex items-center justify-center gap-2"
-          icon={!loading && <Key size={18} />}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full h-12 bg-[#FF6C37] text-white rounded-xl text-[15px] font-semibold shadow-[0_6px_20px_rgba(255,108,55,0.3)] hover:bg-[#F25A24] active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
-          {loading ? "Resetting..." : "Reset Password"}
-        </Button>
+          {loading ? (
+            <div className="w-5 h-5 border-[3px] border-white/30 border-t-white rounded-full animate-spin" />
+          ) : (
+            "Reset Password"
+          )}
+        </button>
       </Form>
 
-      <div className="relative py-2">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-slate-100"></div>
-        </div>
-      </div>
-
-      <p className="text-center text-xs text-slate-400 font-medium">
+      <div className="mt-8 text-center text-[15px] text-gray-500">
         Back to login?{" "}
-        <Link
-          href="/auth/signin"
-          className="text-primary font-bold hover:opacity-80 transition-opacity"
-        >
+        <Link href="/auth/signin" className="text-gray-900 font-semibold hover:text-[#FF6C37] transition-colors ml-1">
           Sign In
         </Link>
-      </p>
+      </div>
     </div>
   );
 }

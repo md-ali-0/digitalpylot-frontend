@@ -2,8 +2,8 @@
 "use client";
 
 import { useForgetPasswordMutation } from "@/redux/features/auth/authApi";
-import { App, Button, Form, Input } from "antd";
-import { Mail, Send } from "lucide-react";
+import { App, Form, Input } from "antd";
+import { Mail } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -14,7 +14,6 @@ export default function ForgotPasswordPage() {
   const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
   const [forgetPassword] = useForgetPasswordMutation();
-
   const [showTenantField, setShowTenantField] = useState(false);
 
   const handleEmailSubmit = async (values: {
@@ -71,14 +70,10 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto space-y-8 animate-fade-in">
-      <div className="space-y-1 mb-6">
-        <h2 className="text-2xl font-extrabold tracking-tight text-slate-900">
-          Forgot Password
-        </h2>
-        <p className="text-slate-400 text-sm font-medium">
-          Enter your email to receive a password reset link
-        </p>
+    <div className="w-full">
+      <div className="text-center mb-10">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Forgot Password</h1>
+        <p className="text-gray-500 text-sm">Enter your email to receive a password reset link</p>
       </div>
 
       <Form
@@ -86,72 +81,57 @@ export default function ForgotPasswordPage() {
         layout="vertical"
         onFinish={handleEmailSubmit}
         requiredMark={false}
-        className="space-y-3"
+        className="space-y-5"
       >
         <Form.Item
           name="email"
-          className="mb-3"
-          label={
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-              Email Address
-            </span>
-          }
+          label={<span className="font-medium text-gray-700">Email Address</span>}
           rules={[
             { required: true, message: "Email is required" },
             { type: "email", message: "Invalid email" },
           ]}
+          className="mb-5!"
         >
           <Input
-            prefix={<Mail size={18} className="text-slate-300 mr-2" />}
+            prefix={<Mail size={16} className="text-gray-400 mr-1" />}
             placeholder="name@company.com"
-            className="h-11 rounded-xl border-slate-200 hover:border-primary focus:border-primary transition-all text-base"
+            className="h-12! rounded-xl! border-gray-200 hover:border-gray-300 focus:border-[#FF6C37] focus:ring-4 focus:ring-orange-500/10 transition-all px-4 text-gray-900"
           />
         </Form.Item>
 
-        {(showTenantField || form.getFieldValue("tenantId")) && (
+        {showTenantField && (
           <Form.Item
             name="tenantId"
-            className="mb-3"
-            label={
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                Network / Subdomain
-              </span>
-            }
+            label={<span className="font-medium text-gray-700">Network / Subdomain</span>}
             help="Enter your network subdomain (e.g. default, acme) if you have multiple accounts"
+            className="mb-5!"
           >
             <Input
               placeholder="e.g. default"
-              className="h-11 rounded-xl border-slate-200 hover:border-primary focus:border-primary transition-all text-base"
+              className="h-12! rounded-xl! border-gray-200 hover:border-gray-300 focus:border-[#FF6C37] transition-all px-4"
             />
           </Form.Item>
         )}
 
-        <Button
-          type="primary"
-          htmlType="submit"
-          loading={loading}
-          className="w-full h-12 bg-primary hover:opacity-95 text-white font-bold rounded-xl shadow-lg shadow-primary/10 border-none mt-2 flex items-center justify-center gap-2"
-          icon={!loading && <Send size={18} />}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full h-12 bg-[#FF6C37] text-white rounded-xl text-[15px] font-semibold shadow-[0_6px_20px_rgba(255,108,55,0.3)] hover:bg-[#F25A24] active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
-          {loading ? "Sending..." : "Send Reset Link"}
-        </Button>
+          {loading ? (
+            <div className="w-5 h-5 border-[3px] border-white/30 border-t-white rounded-full animate-spin" />
+          ) : (
+            "Send Reset Link"
+          )}
+        </button>
       </Form>
 
-      <div className="relative py-2">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-slate-100"></div>
-        </div>
-      </div>
-
-      <p className="text-center text-xs text-slate-400 font-medium">
+      <div className="mt-8 text-center text-[15px] text-gray-500">
         Remember your password?{" "}
-        <Link
-          href="/auth/signin"
-          className="text-primary font-bold hover:opacity-80 transition-opacity"
-        >
+        <Link href="/auth/signin" className="text-gray-900 font-semibold hover:text-[#FF6C37] transition-colors ml-1">
           Sign In
         </Link>
-      </p>
+      </div>
     </div>
   );
 }

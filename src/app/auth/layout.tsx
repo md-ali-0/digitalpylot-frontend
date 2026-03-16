@@ -1,3 +1,5 @@
+import LogoSvg from "@/components/shared/logo";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -7,84 +9,45 @@ interface AuthLayoutProps {
 
 export default function AuthLayout({ children }: AuthLayoutProps) {
   return (
-    <div className="auth-shell">
-      <div className="auth-shell__aurora auth-shell__aurora--left"></div>
-      <div className="auth-shell__aurora auth-shell__aurora--right"></div>
-
-      <div className="auth-shell__panel">
-        <div className="auth-shell__form-column">
-          <div className="auth-shell__brand-row">
-            <Link href="/" className="auth-shell__brand">
-              <span className="auth-shell__brand-mark" aria-hidden="true">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-              </span>
-              <span className="auth-shell__brand-copy">
-                <span className="auth-shell__brand-name">Digital Pylot</span>
-                <span className="auth-shell__brand-tag">
-                  Dynamic access platform
-                </span>
-              </span>
+    <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center font-sans p-4 lg:p-0">
+      <div className="w-full max-w-[1360px] flex bg-[#FAFAFA] overflow-hidden">
+        {/* Left Pane - Form Area */}
+        <div className="w-full lg:w-1/2 flex flex-col relative min-h-[820px] bg-white lg:bg-transparent">
+          {/* Brand Header */}
+          <header className="p-6 sm:p-8 lg:p-10 absolute top-0 left-0 w-full z-50">
+            <Link href="/" className="flex items-center no-underline group w-fit">
+              <LogoSvg />
             </Link>
-          </div>
+          </header>
 
-          <div className="auth-shell__content">{children}</div>
-
-          <div className="auth-shell__footer">
-            <p>
-              &copy; {new Date().getFullYear()} Digital Pylot. Secure login
-              experience for modern RBAC systems.
-            </p>
-          </div>
-        </div>
-
-        <div className="auth-shell__showcase">
-          <div className="auth-shell__showcase-grid"></div>
-          <div className="auth-shell__showcase-inner">
-            <div className="auth-shell__eyebrow">RBAC System v2.0</div>
-            <h2 className="auth-shell__headline">
-              Permissions define every screen, route, and action.
-            </h2>
-            <p className="auth-shell__description">
-              One shared platform where Admins and Managers control access atom
-              by atom without hard-coded role walls.
-            </p>
-
-            <div className="auth-shell__stat-card">
-              <div className="auth-shell__stat-top">
-                <span>Resolved access map</span>
-                <span>Live</span>
-              </div>
-              <div className="auth-shell__stat-metric">148 atoms</div>
-              <div className="auth-shell__stat-bars">
-                <span className="is-active"></span>
-                <span className="is-active"></span>
-                <span className="is-active"></span>
-                <span></span>
-                <span></span>
-                <span className="is-accent"></span>
-              </div>
-              <div className="auth-shell__stat-foot">
-                <span>Grant ceiling enforced</span>
-                <span>Audit trail ready</span>
-              </div>
+          {/* Main Content Area */}
+          <main className="flex-1 flex items-center justify-center p-6 sm:p-12 relative z-10 w-full mt-24 lg:mt-0">
+            <div className="w-full max-w-[440px] bg-white rounded-[32px] p-8 sm:p-12 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.08)] border border-gray-100">
+              {children}
             </div>
+          </main>
+        </div>
+        
 
-            <div className="auth-shell__feature-list">
-              <div>
-                <strong>Dynamic routing</strong>
-                <span>Every page is guarded by permission atoms.</span>
-              </div>
-              <div>
-                <strong>Flexible delegation</strong>
-                <span>Managers can only assign access they already hold.</span>
-              </div>
-              <div>
-                <strong>Single source of truth</strong>
-                <span>UI, APIs, and audit actions stay aligned.</span>
-              </div>
+        {/* Right Pane - Visual Area */}
+        <div className="hidden lg:flex lg:w-1/2 justify-end">
+          <div className="w-[680px] h-[820px] relative rounded-[20px] overflow-hidden bg-[#FFF5F1]">
+            <Image 
+              src="/auth-side-banner.png" 
+              alt="Background" 
+              fill
+              className="object-cover"
+              priority
+            />
+            {/* Dashboard Overlay */}
+            <div className="absolute w-[960px] h-[600px] animate-dashboard z-20 pointer-events-none rounded-[12px] border-8 border-black/5 shadow-[19px_16px_55px_0px_rgba(0,0,0,0.05)] overflow-hidden bg-white">
+              <Image 
+                src="/auth-side-dashboard.png" 
+                alt="Dashboard Preview" 
+                fill
+                className="object-cover"
+                priority
+              />
             </div>
           </div>
         </div>

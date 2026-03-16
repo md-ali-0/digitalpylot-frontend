@@ -10,6 +10,7 @@ export interface DecryptedSession {
   userId: string | null;
   email: string;
   roles: string[];
+  permissions?: string[];
   tenantId: string;
   iat: number;
   exp: number;

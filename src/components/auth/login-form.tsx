@@ -4,13 +4,14 @@ import { login } from "@/redux/features/auth/authSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import { signin } from "@/service/auth";
 import { App, Form, Input } from "antd";
-import { ArrowRight, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function LoginForm() {
   const [localLoading, setLocalLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [loginForm] = Form.useForm();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -39,14 +40,10 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="auth-form-card">
-      <div className="auth-form-card__header">
-        <span className="auth-form-card__eyebrow">Welcome back</span>
-        <h1 className="auth-form-card__title">Sign in to your workspace</h1>
-        <p className="auth-form-card__description">
-          Use your email and password to continue into the permission-driven
-          dashboard.
-        </p>
+    <div className="w-full">
+      <div className="text-center mb-10">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Login</h1>
+        <p className="text-gray-500 text-sm">Enter your details to continue</p>
       </div>
 
       <Form
@@ -54,73 +51,66 @@ export default function LoginForm() {
         layout="vertical"
         onFinish={handleLogin}
         requiredMark={false}
-        className="space-y-4"
+        className="space-y-5"
       >
         <Form.Item
           name="email"
-          className="mb-4"
-          label={<span className="auth-form-card__label">Email address</span>}
+          label={<span className="font-medium text-gray-700">Email</span>}
           rules={[
             { required: true, message: "Email is required" },
             { type: "email", message: "Invalid email" },
           ]}
+          className="mb-5!"
         >
           <Input
-            prefix={<Mail size={18} className="auth-form-card__icon" />}
-            placeholder="name@company.com"
-            className="auth-form-card__input"
+            placeholder="example@email.com"
+            className="h-12! rounded-xl! border-gray-200 hover:border-gray-300 focus:border-[#FF6C37] focus:ring-4 focus:ring-orange-500/10 transition-all px-4 text-gray-900"
           />
         </Form.Item>
 
         <Form.Item
           name="password"
-          className="mb-3"
-          label={<span className="auth-form-card__label">Password</span>}
+          label={<span className="font-medium text-gray-700">Password</span>}
           rules={[{ required: true, message: "Password is required" }]}
+          className="mb-5!"
         >
           <Input.Password
-            prefix={<Lock size={18} className="auth-form-card__icon" />}
             placeholder="Enter your password"
-            className="auth-form-card__input"
+            className="h-12! rounded-xl! border-gray-200 hover:border-gray-300 focus:border-[#FF6C37] focus:ring-4 focus:ring-orange-500/10 transition-all px-4 text-gray-900"
+            iconRender={(visible) => (visible ? <Eye size={18} className="text-gray-400" /> : <EyeOff size={18} className="text-gray-400" />)}
           />
         </Form.Item>
 
-        <div className="auth-form-card__meta">
-          <p>Access token refresh and secure cookie session enabled.</p>
-          <Link href="/auth/forgot-password">Forgot password?</Link>
+        <div className="flex items-center justify-between mb-8">
+          <label className="flex items-center gap-2 cursor-pointer group">
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="w-[18px] h-[18px] rounded-[4px] border-gray-300 text-[#FF6C37] focus:ring-[#FF6C37] cursor-pointer"
+            />
+            <span className="text-sm text-gray-500 group-hover:text-gray-700 transition-colors">Remember me</span>
+          </label>
+          <Link href="/auth/forgot-password" title="Forgot password?" className="text-sm text-[#FF6C37] font-medium hover:text-orange-600 transition-colors">
+            Forgot password?
+          </Link>
         </div>
 
         <button
           type="submit"
           disabled={localLoading}
-          className="auth-form-card__submit group"
+          className="w-full h-12 bg-[#FF6C37] text-white rounded-xl text-[15px] font-semibold shadow-[0_6px_20px_rgba(255,108,55,0.3)] hover:bg-[#F25A24] active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3"
         >
-          <div className="relative z-10 flex items-center justify-center gap-3">
-            {localLoading ? (
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white"></div>
-            ) : (
-              <>
-                <span>Sign In</span>
-                <ArrowRight
-                  size={18}
-                  className="transition-transform group-hover:translate-x-1"
-                />
-              </>
-            )}
-          </div>
-          <div className="auth-form-card__submit-glow"></div>
+          {localLoading ? (
+            <div className="w-5 h-5 border-[3px] border-white/30 border-t-white rounded-full animate-spin"></div>
+          ) : (
+            "Log in"
+          )}
         </button>
       </Form>
 
-      <div className="auth-form-card__footer">
-        <div>
-          <span>Need verification?</span>
-          <Link href="/auth/verify-email">Verify email</Link>
-        </div>
-        <div>
-          <span>Secure reset flow</span>
-          <Link href="/auth/forgot-password">Open recovery</Link>
-        </div>
+      <div className="mt-8 text-center text-[15px] text-gray-500">
+        Don't have an account? <Link href="/auth/signup" className="text-gray-900 font-semibold hover:text-[#FF6C37] transition-colors ml-1">Sign up</Link>
       </div>
     </div>
   );
